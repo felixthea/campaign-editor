@@ -1,0 +1,19 @@
+<!doctype HTML>
+<html>
+<head>
+</head>
+<body>
+</body>
+</html>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$.ajax({
+		url: 'http://challenge.mediamath.com/api/campaigns?api_token=c3ac5cdb9e79c59ec617345970c9a399880516ef',
+		type: 'get',
+		success: function(data,status,jqXHR){
+			console.log(data)
+		}
+	})
+})
+</script>
