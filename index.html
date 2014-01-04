@@ -1,138 +1,7 @@
 <!doctype HTML>
 <html>
 <head>
-	<style>
-	body, div, section, form, ul, li{
-		padding:0;
-		margin:0;
-		border:0;
-	}
-	
-	.group:after{
-		content:"";
-		display:block;
-		clear:both;
-	}
-	
-	section.campaign-lookup{
-		float: left;
-		width: 300px;
-	}
-	
-	section.campaigns{
-		float: right;
-		width: 650px;
-	}
-	
-	.hidden{
-		display: none;
-	}
-	
-	.container{
-		width: 1000px;
-		margin: auto;
-		position: relative;
-		padding-top:20px;
-	}
-	
-	#success-message, #error-message{
-		position: absolute;
-		background: white;
-		border: 1px solid black;
-		border-radius: 15px;
-		padding: 20px;
-		top: 200px;
-		z-index: 2;
-	}
-	
-	#success-message{
-		left: 400px;
-	}
-	
-	#error-message{
-		left: 450px;
-	}
-	
-	.black-overlay{
-	  display: none;
-	  position: absolute;
-	  top: 0;
-	  left: 0;
-	  width: 100%;
-	  height: 100%;
-	  background-color: black;
-	  z-index: 1;
-	  opacity: 0.6;
-	}
-	
-	li{
-		list-style:none;
-	}
-	
-	ul.campaign-list{
-		border: 1px solid black;
-	}
-	
-	li.campaign-header{
-		background: gray;
-	}
-	
-	li.campaign-header ul li{
-		float: left;
-	}
-	
-	li#name{
-		padding-left:10px;
-	}
-	
-	li#status{
-		padding-left:25px;
-	}
-	
-	li#budget{
-		padding-left:60px;
-	}
-	
-	li#start-date{
-		padding-left:75px;
-	}
-	
-	li#end-date{
-		padding-left:65px;
-	}
-	
-	li.campaign:nth-child(even){
-		background:white;
-	}
-	
-	li.campaign:nth-child(odd){
-		background:#ccc;
-	}
-	
-	button{
-		background:blue;
-		color:white;
-		width: 100px;
-		border: 1px solid black;
-	}
-	
-	button#save-campaigns{
-		float:right;
-	}
-	
-	button#get-campaigns{
-		float:right;
-	}
-	
-	label[for="agency-selector"]{
-		padding-right:16px;
-	}
-	
-	form#campaign-selector select{
-		width: 230px;
-	}
-	
-	</style>
+	<link rel="stylesheet" href="style.css" type="text/css" media="all">
 </head>
 <body>
 	<div class="container">
@@ -192,10 +61,15 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	
-	var populateAgencySelect = function() {
-		var req = $.ajax({
-			url: 'http://challenge.mediamath.com/api/agencies?api_token=c3ac5cdb9e79c59ec617345970c9a399880516ef'
+	var get = function(resource){
+		var apiToken = "?api_token=c3ac5cdb9e79c59ec617345970c9a399880516ef"
+		return $.ajax({
+			url: 'http://challenge.mediamath.com/api/'+resource+apiToken
 		})
+	}
+	
+	var populateAgencySelect = function() {
+		var req = get("agencies")
 		
 		var updateAgencySelect = function(resp) {
 			_.each(resp.agencies, function(agency,index){
@@ -216,9 +90,7 @@ $(document).ready(function() {
 	var populateAdvertiserSelect = function(agencyId) {
 		$('#advertiser-selector').html("<option value='no-choice'>Choose an advertiser...</option")
 		
-		var req = $.ajax({
-			url: 'http://challenge.mediamath.com/api/advertisers?api_token=c3ac5cdb9e79c59ec617345970c9a399880516ef',
-		})
+		var req = get("advertisers")
 		
 		var updateAdvertiserSelect = function(resp){
 			var agencyAdvertisers = _.where(resp.advertisers, {agency_id: agencyId})
@@ -240,9 +112,7 @@ $(document).ready(function() {
 	}
 	
 	var populateCampaigns = function(advertiserId){
-		var req = $.ajax({
-			url: 'http://challenge.mediamath.com/api/campaigns?api_token=c3ac5cdb9e79c59ec617345970c9a399880516ef'
-		})
+		var req = get("campaigns")
 		
 		var $campaignList = $('.campaign-list')
 		
@@ -347,10 +217,9 @@ $(document).ready(function() {
 		$(event.currentTarget).parent().addClass('hidden')
 	})
 	
-	$('.campaign-header input[type=checkbox]').on('click', function(event){
-		$allCheckBoxes = $('.campaign-list input[type=checkbox]')
+	$('#check-all').on('click', function(event){
+		$allCheckBoxes = $('input#to-update')
 		if ($(event.currentTarget).prop('checked')) {
-			console.log("checking all checkboxes")
 			$allCheckBoxes.prop("checked", true)
 		} else {
 			console.log("unchecking all checkboxes")
@@ -363,14 +232,22 @@ $(document).ready(function() {
 		var numChecked = $('input#to-update').filter(':checked').length
 		
 		if (numChecked === numCampaigns){
-			$('#check-all').prop('indeterminate', false)
-			$('#check-all').prop('checked', true)
+			setIndeterminate(false)
+			setAllChecked(true)
 		} else if (numChecked === 0){
-			$('#check-all').prop('checked', false)
-			$('#check-all').prop('indeterminate', false)
+			setAllChecked(false)
+			setIndeterminate(false)
 		} else if (numChecked < numCampaigns){
-			$('#check-all').prop('checked', false)
-			$('#check-all').prop('indeterminate', true)
+			setAllChecked(false)
+			setIndeterminate(true)
+		}
+		
+		function setIndeterminate(status){
+			status ? $('#check-all').prop('indeterminate', true) : $('#check-all').prop('indeterminate', false)
+		}
+		
+		function setAllChecked(status){
+			status ? $('#check-all').prop('checked', true) : $('#check-all').prop('checked', false)
 		}
 	})
 	

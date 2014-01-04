@@ -1,0 +1,129 @@
+body, div, section, form, ul, li{
+	padding:0;
+	margin:0;
+	border:0;
+}
+
+.group:after{
+	content:"";
+	display:block;
+	clear:both;
+}
+
+section.campaign-lookup{
+	float: left;
+	width: 300px;
+}
+
+section.campaigns{
+	float: right;
+	width: 650px;
+}
+
+.hidden{
+	display: none;
+}
+
+.container{
+	width: 1000px;
+	margin: auto;
+	position: relative;
+	padding-top:20px;
+}
+
+#success-message, #error-message{
+	position: absolute;
+	background: white;
+	border: 1px solid black;
+	border-radius: 15px;
+	padding: 20px;
+	top: 200px;
+	z-index: 2;
+}
+
+#success-message{
+	left: 400px;
+}
+
+#error-message{
+	left: 450px;
+}
+
+.black-overlay{
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+li{
+	list-style:none;
+}
+
+ul.campaign-list{
+	border: 1px solid black;
+}
+
+li.campaign-header{
+	background: gray;
+}
+
+li.campaign-header ul li{
+	float: left;
+}
+
+li#name{
+	padding-left:10px;
+}
+
+li#status{
+	padding-left:25px;
+}
+
+li#budget{
+	padding-left:60px;
+}
+
+li#start-date{
+	padding-left:75px;
+}
+
+li#end-date{
+	padding-left:65px;
+}
+
+li.campaign:nth-child(even){
+	background:white;
+}
+
+li.campaign:nth-child(odd){
+	background:#ccc;
+}
+
+button{
+	background:blue;
+	color:white;
+	width: 100px;
+	border: 1px solid black;
+}
+
+button#save-campaigns{
+	float:right;
+}
+
+button#get-campaigns{
+	float:right;
+}
+
+label[for="agency-selector"]{
+	padding-right:16px;
+}
+
+form#campaign-selector select{
+	width: 230px;
+}
