@@ -2,6 +2,12 @@
 <html>
 <head>
 	<style>
+	body, div, section, form, ul, li{
+		padding:0;
+		margin:0;
+		border:0;
+	}
+	
 	.group:after{
 		content:"";
 		display:block;
@@ -10,13 +16,12 @@
 	
 	section.campaign-lookup{
 		float: left;
-		width: 500px;
+		width: 300px;
 	}
 	
 	section.campaigns{
 		float: right;
-		width: 700px;
-		background: red;
+		width: 650px;
 	}
 	
 	.hidden{
@@ -24,9 +29,10 @@
 	}
 	
 	.container{
-		width: 1200px;
+		width: 1000px;
 		margin: auto;
 		position: relative;
+		padding-top:20px;
 	}
 	
 	#success-message, #error-message{
@@ -63,17 +69,67 @@
 		list-style:none;
 	}
 	
+	ul.campaign-list{
+		border: 1px solid black;
+	}
+	
 	li.campaign-header{
 		background: gray;
 	}
 	
 	li.campaign-header ul li{
 		float: left;
-		padding-left: 40px;
 	}
 	
-	li.campaign-header ul li:nth-child(1){
-		padding-left:0;
+	li#name{
+		padding-left:10px;
+	}
+	
+	li#status{
+		padding-left:25px;
+	}
+	
+	li#budget{
+		padding-left:60px;
+	}
+	
+	li#start-date{
+		padding-left:75px;
+	}
+	
+	li#end-date{
+		padding-left:65px;
+	}
+	
+	li.campaign:nth-child(even){
+		background:white;
+	}
+	
+	li.campaign:nth-child(odd){
+		background:#ccc;
+	}
+	
+	button{
+		background:blue;
+		color:white;
+		width: 100px;
+		border: 1px solid black;
+	}
+	
+	button#save-campaigns{
+		float:right;
+	}
+	
+	button#get-campaigns{
+		float:right;
+	}
+	
+	label[for="agency-selector"]{
+		padding-right:16px;
+	}
+	
+	form#campaign-selector select{
+		width: 230px;
 	}
 	
 	</style>
@@ -86,10 +142,12 @@
 				<select id="agency-selector">
 					<option value="no-choice">Choose an agency...</option>
 				</select>
+				<br>
 				<label for="advertiser-selector">Advertiser</label>
 				<select id="advertiser-selector" disabled="true">
 					<option value="no-choice">Choose an advertiser...</option>
 				</select>
+				<br>
 				<button id="get-campaigns" disabled="true">Get Campaigns</button>
 			</form>
 		</section>
@@ -97,12 +155,12 @@
 			<ul class="campaign-list">
 				<li class="campaign-header group">
 					<ul>
-						<li><input type="checkbox"></li>
-						<li>Campaign Name</li>
-						<li>Status</li>
-						<li>Budget</li>
-						<li>Start Date</li>
-						<li>End Date</li>
+						<li id="checkbox"><input type="checkbox" id="check-all" disabled="true"></li>
+						<li id="name">Campaign Name</li>
+						<li id="status">Status</li>
+						<li id="budget">Budget</li>
+						<li id="start-date">Start Date</li>
+						<li id="end-date">End Date</li>
 					</ul>
 				</li>
 			</ul>
@@ -189,7 +247,7 @@ $(document).ready(function() {
 		var $campaignList = $('.campaign-list')
 		
 		var renderCampaigns = function (resp) {
-			var $campaignHeader = $('.campaign-header').clone()
+			var $campaignHeader = $('.campaign-header').clone({withDataAndEvents: true})
 			$('.campaign-list').empty()
 			$('.campaign-list').append($campaignHeader)
 			
@@ -200,6 +258,8 @@ $(document).ready(function() {
 				$campaignLi.html(buildCampaignForm(campaign))
 				$campaignList.append($campaignLi)
 			})
+			
+			$('.campaign-header #checkbox input').attr("disabled",false)
 		}
 		
 		var error = function(req,status,error){
@@ -211,23 +271,27 @@ $(document).ready(function() {
 	
 	var buildCampaignForm = function(campaign) {
 		var $form = $('<form></form>')
-		var $checkbox = $('<input type="checkbox" id="to-update" checked></input>')
+		var $checkbox = $('<input type="checkbox" id="to-update"></input>')
 		var $name = $('<input type="text" name="campaign-name"></input>')
 		var $status = $('<select name="campaign-status"></select>')
 		var $budget = $('<input type="number" name="campaign-budget"></input>')
-		var $startDate = $('<input type="text" name="campaign-start-date"></input>')
-		var $endDate = $('<input type="text" name="campaign-end-date"></input>')
+		var $startDate = $('<input type="date" name="campaign-start-date"></input>')
+		var $endDate = $('<input type="date" name="campaign-end-date"></input>')
 		
 		$status.append($('<option value="true">Active</input>'))
 		$status.append($('<option value="false">Inactive</input>'))
 		
+		startDateString = campaign.start_date.substring(0,10)
+		endDateString = campaign.end_date.substring(0,10)
+		
 		$form.attr("data-id", campaign._id)
+		$checkbox.prop("checked", false)
 		$name.attr("value", campaign.name)
 		campaign.status ? $status.attr("value", true) : $status.attr("value", false)
 		$budget.attr("value", campaign.budget)
-		$startDate.attr("value", campaign.start_date)
-		$endDate.attr("value", campaign.end_date)
-		
+		$startDate.attr("value", startDateString)
+		$endDate.attr("value", endDateString)
+
 		$form.append($checkbox, [$name, $status, $budget, $startDate, $endDate])
 		
 		return $form
@@ -281,6 +345,33 @@ $(document).ready(function() {
 	$('.messages').on('click', 'button', function(event){
 		$('.black-overlay').css('display', 'none');
 		$(event.currentTarget).parent().addClass('hidden')
+	})
+	
+	$('.campaign-header input[type=checkbox]').on('click', function(event){
+		$allCheckBoxes = $('.campaign-list input[type=checkbox]')
+		if ($(event.currentTarget).prop('checked')) {
+			console.log("checking all checkboxes")
+			$allCheckBoxes.prop("checked", true)
+		} else {
+			console.log("unchecking all checkboxes")
+			$allCheckBoxes.prop("checked", false)
+		}
+	})
+	
+	$('.campaign-list').on('change','#to-update', function(event){
+		var numCampaigns = $('input#to-update').length
+		var numChecked = $('input#to-update').filter(':checked').length
+		
+		if (numChecked === numCampaigns){
+			$('#check-all').prop('indeterminate', false)
+			$('#check-all').prop('checked', true)
+		} else if (numChecked === 0){
+			$('#check-all').prop('checked', false)
+			$('#check-all').prop('indeterminate', false)
+		} else if (numChecked < numCampaigns){
+			$('#check-all').prop('checked', false)
+			$('#check-all').prop('indeterminate', true)
+		}
 	})
 	
 	var disableAdvertiserSelector = function() {
