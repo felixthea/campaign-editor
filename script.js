@@ -63,6 +63,8 @@ $(document).ready(function() {
 			})
 			
 			$('.campaign-header #checkbox input').attr("disabled",false)
+			$('#save-campaigns').attr("disabled", false)
+			$('#check-all').prop("checked", false)
 		}
 		
 		var error = function(req,status,error){
@@ -101,7 +103,10 @@ $(document).ready(function() {
 	}
 	
 	var updateCampaigns = function() {
-		var $campaigns = $('.campaign-list').find('input:checked').parent()
+		var $campaigns = $('.campaign-list').find('.campaign form input:checked').parent()
+		var numUpdatedCampaigns = $campaigns.length
+		var successCount = 0;
+		
 		_.each($campaigns,function(campaign,index,list){
 			var $formData = $(campaign).serialize()
 			var campaignId = $(campaign).attr("data-id")
@@ -110,12 +115,13 @@ $(document).ready(function() {
 				type: 'post',
 				data: $formData,
 				success: function(data,status,jqXHR){
-					showSuccessMessage();
-				},
-				error: function(req,status,err){
-					showErrorMessage();
+					successCount += 1
 				}
 			})
+		})
+		
+		$(document).ajaxStop(function(){
+			successCount === numUpdatedCampaigns ? showSuccessMessage() : showErrorMessage();
 		})
 	}
 	

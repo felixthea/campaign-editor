@@ -39,14 +39,15 @@ section.campaigns{
 	padding: 20px;
 	top: 200px;
 	z-index: 2;
+	text-align: center;
 }
 
 #success-message{
-	left: 400px;
+	left: 300px;
 }
 
 #error-message{
-	left: 450px;
+	left: 350px;
 }
 
 .black-overlay{
@@ -120,10 +121,22 @@ button#get-campaigns{
 	float:right;
 }
 
+button:disabled{
+	background: gray;
+	color: #ccc;
+}
+
 label[for="agency-selector"]{
 	padding-right:16px;
 }
 
 form#campaign-selector select{
 	width: 230px;
+}
+
+#success-ok, #error-ok{
+	padding-top:20px;
+	padding-bottom:20px;
+	width: 200px;
+	border-radius: 10px;
 }
