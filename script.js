@@ -63,7 +63,7 @@ $(document).ready(function() {
 			})
 			
 			$('.campaign-header #checkbox input').attr("disabled",false)
-			$('#save-campaigns').attr("disabled", false)
+			// $('#save-campaigns').attr("disabled", false)
 			$('#check-all').prop("checked", false)
 		}
 		
@@ -165,15 +165,17 @@ $(document).ready(function() {
 		$allCheckBoxes = $('input#to-update')
 		if ($(event.currentTarget).prop('checked')) {
 			$allCheckBoxes.prop("checked", true)
+			$('#save-campaigns').attr("disabled", false)
 		} else {
-			console.log("unchecking all checkboxes")
 			$allCheckBoxes.prop("checked", false)
+			$('#save-campaigns').attr("disabled", true)
 		}
 	})
 	
 	$('.campaign-list').on('change','#to-update', function(event){
 		var numCampaigns = $('input#to-update').length
 		var numChecked = $('input#to-update').filter(':checked').length
+		$('#save-campaigns').attr("disabled", false)
 		
 		if (numChecked === numCampaigns){
 			setIndeterminate(false)
@@ -181,6 +183,7 @@ $(document).ready(function() {
 		} else if (numChecked === 0){
 			setAllChecked(false)
 			setIndeterminate(false)
+			$('#save-campaigns').attr("disabled", true)
 		} else if (numChecked < numCampaigns){
 			setAllChecked(false)
 			setIndeterminate(true)
