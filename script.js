@@ -8,13 +8,14 @@ $(document).ready(function() {
 	}
 	
 	function populateAgencySelect() {
-		var updateAgencySelect = function(resp) {
+		function updateAgencySelect (resp) {
 			_.each(resp.agencies, function(agency,index){
 				var $agencyOption = $('<option></option>')
 				$agencyOption.attr("value",agency._id)
 				$agencyOption.html(agency.name)
 				$('#agency-selector').append($agencyOption)
 			})
+			$('#agency-selector').trigger('chosen:updated');
 		}
 		
 		var error = function(req,status,error){
@@ -24,10 +25,10 @@ $(document).ready(function() {
 		get("agencies").then(updateAgencySelect)
 	}
 	
-	var populateAdvertiserSelect = function(agencyId) {
+	function populateAdvertiserSelect(agencyId) {
 		$('#advertiser-selector').html("<option value='no-choice'>Choose an advertiser...</option")
 		
-		var updateAdvertiserSelect = function(resp){
+		function updateAdvertiserSelect(resp){
 			var agencyAdvertisers = _.where(resp.advertisers, {agency_id: agencyId})
 			
 			_.each(agencyAdvertisers, function(advertiser,index){
@@ -36,7 +37,8 @@ $(document).ready(function() {
 				$advertiserOption.html(advertiser.name)
 				$('#advertiser-selector').append($advertiserOption)
 			})
-			enableElement($('#advertiser-selector'))
+			enableElement($('#advertiser-selector'));
+			$('#advertiser-selector').trigger('chosen:updated');
 		}
 		
 		var error = function(req,status,error){
@@ -46,10 +48,10 @@ $(document).ready(function() {
 		get("advertisers").then(updateAdvertiserSelect, error)
 	}
 	
-	var populateCampaigns = function(advertiserId){		
+	function populateCampaigns(advertiserId){		
 		var $campaignList = $('.campaign-list')
 		
-		var renderCampaigns = function (resp) {
+		function renderCampaigns(resp) {
 			var $campaignHeader = $('.campaign-header').clone({withDataAndEvents: true})
 			$('.campaign-list').empty()
 			$('.campaign-list').append($campaignHeader)
@@ -63,7 +65,6 @@ $(document).ready(function() {
 			})
 			
 			$('.campaign-header #checkbox input').attr("disabled",false)
-			$('#save-campaigns').attr("disabled", false)
 			$('#check-all').prop("checked", false)
 		}
 		
@@ -165,15 +166,17 @@ $(document).ready(function() {
 		$allCheckBoxes = $('input#to-update')
 		if ($(event.currentTarget).prop('checked')) {
 			$allCheckBoxes.prop("checked", true)
+			$('#save-campaigns').attr("disabled", false)
 		} else {
-			console.log("unchecking all checkboxes")
 			$allCheckBoxes.prop("checked", false)
+			$('#save-campaigns').attr("disabled", true)
 		}
 	})
 	
 	$('.campaign-list').on('change','#to-update', function(event){
 		var numCampaigns = $('input#to-update').length
 		var numChecked = $('input#to-update').filter(':checked').length
+		$('#save-campaigns').attr("disabled", false)
 		
 		if (numChecked === numCampaigns){
 			setIndeterminate(false)
@@ -181,6 +184,7 @@ $(document).ready(function() {
 		} else if (numChecked === 0){
 			setAllChecked(false)
 			setIndeterminate(false)
+			$('#save-campaigns').attr("disabled", true)
 		} else if (numChecked < numCampaigns){
 			setAllChecked(false)
 			setIndeterminate(true)
@@ -209,4 +213,5 @@ $(document).ready(function() {
 	}
 	
 	populateAgencySelect();
+	$('select').chosen();
 })
