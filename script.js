@@ -8,13 +8,14 @@ $(document).ready(function() {
 	}
 	
 	function populateAgencySelect() {
-		var updateAgencySelect = function(resp) {
+		function updateAgencySelect (resp) {
 			_.each(resp.agencies, function(agency,index){
 				var $agencyOption = $('<option></option>')
 				$agencyOption.attr("value",agency._id)
 				$agencyOption.html(agency.name)
 				$('#agency-selector').append($agencyOption)
 			})
+			$('#agency-selector').trigger('chosen:updated');
 		}
 		
 		var error = function(req,status,error){
@@ -24,10 +25,10 @@ $(document).ready(function() {
 		get("agencies").then(updateAgencySelect)
 	}
 	
-	var populateAdvertiserSelect = function(agencyId) {
+	function populateAdvertiserSelect(agencyId) {
 		$('#advertiser-selector').html("<option value='no-choice'>Choose an advertiser...</option")
 		
-		var updateAdvertiserSelect = function(resp){
+		function updateAdvertiserSelect(resp){
 			var agencyAdvertisers = _.where(resp.advertisers, {agency_id: agencyId})
 			
 			_.each(agencyAdvertisers, function(advertiser,index){
@@ -36,7 +37,8 @@ $(document).ready(function() {
 				$advertiserOption.html(advertiser.name)
 				$('#advertiser-selector').append($advertiserOption)
 			})
-			enableElement($('#advertiser-selector'))
+			enableElement($('#advertiser-selector'));
+			$('#advertiser-selector').trigger('chosen:updated');
 		}
 		
 		var error = function(req,status,error){
@@ -46,10 +48,10 @@ $(document).ready(function() {
 		get("advertisers").then(updateAdvertiserSelect, error)
 	}
 	
-	var populateCampaigns = function(advertiserId){		
+	function populateCampaigns(advertiserId){		
 		var $campaignList = $('.campaign-list')
 		
-		var renderCampaigns = function (resp) {
+		function renderCampaigns(resp) {
 			var $campaignHeader = $('.campaign-header').clone({withDataAndEvents: true})
 			$('.campaign-list').empty()
 			$('.campaign-list').append($campaignHeader)
@@ -63,7 +65,6 @@ $(document).ready(function() {
 			})
 			
 			$('.campaign-header #checkbox input').attr("disabled",false)
-			// $('#save-campaigns').attr("disabled", false)
 			$('#check-all').prop("checked", false)
 		}
 		
@@ -212,4 +213,5 @@ $(document).ready(function() {
 	}
 	
 	populateAgencySelect();
+	$('select').chosen();
 })
