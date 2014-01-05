@@ -65,7 +65,7 @@ $(document).ready(function() {
 			})
 			
 			$('.campaign-header #checkbox input').attr("disabled",false)
-			$('#check-all').prop("checked", false)
+
 		}
 		
 		var error = function(req,status,error){
