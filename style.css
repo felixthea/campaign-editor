@@ -17,7 +17,7 @@ section.campaign-lookup{
 
 section.campaigns{
 	float: right;
-	width: 650px;
+	width: 670px;
 }
 
 .hidden{
@@ -83,7 +83,7 @@ li#name{
 }
 
 li#status{
-	padding-left:25px;
+	padding-left:35px;
 }
 
 li#budget{
@@ -91,11 +91,11 @@ li#budget{
 }
 
 li#start-date{
-	padding-left:75px;
+	padding-left:80px;
 }
 
 li#end-date{
-	padding-left:65px;
+	padding-left:90px;
 }
 
 li.campaign:nth-child(even){
@@ -139,4 +139,8 @@ form#campaign-selector select{
 	padding-bottom:20px;
 	width: 200px;
 	border-radius: 10px;
+}
+
+.form-template{
+	display:none;
 }

@@ -65,7 +65,6 @@ $(document).ready(function() {
 			})
 			
 			$('.campaign-header #checkbox input').attr("disabled",false)
-
 		}
 		
 		var error = function(req,status,error){
@@ -75,35 +74,22 @@ $(document).ready(function() {
 		get("campaigns").then(renderCampaigns,error)
 	}
 	
-	var buildCampaignForm = function(campaign) {
-		var $form = $('<form></form>')
-		var $checkbox = $('<input type="checkbox" id="to-update"></input>')
-		var $name = $('<input type="text" name="campaign-name"></input>')
-		var $status = $('<select name="campaign-status"></select>')
-		var $budget = $('<input type="number" name="campaign-budget"></input>')
-		var $startDate = $('<input type="date" name="campaign-start-date"></input>')
-		var $endDate = $('<input type="date" name="campaign-end-date"></input>')
-		
-		$status.append($('<option value="true">Active</input>'))
-		$status.append($('<option value="false">Inactive</input>'))
-		
-		startDateString = campaign.start_date.substring(0,10)
-		endDateString = campaign.end_date.substring(0,10)
-		
+	function buildCampaignForm(campaign) {
+		var $formHTML = $($('.form-template').html())
+		var $form = $formHTML.clone()
+		var startDateString = campaign.start_date.substring(0,10)
+		var endDateString = campaign.end_date.substring(0,10)
 		$form.attr("data-id", campaign._id)
-		$checkbox.prop("checked", false)
-		$name.attr("value", campaign.name)
-		campaign.status ? $status.attr("value", true) : $status.attr("value", false)
-		$budget.attr("value", campaign.budget)
-		$startDate.attr("value", startDateString)
-		$endDate.attr("value", endDateString)
-
-		$form.append($checkbox, [$name, $status, $budget, $startDate, $endDate])
-		
+		$form.find('input[type=checkbox]').attr('id', 'to-update')
+		$form.find('input[name=campaign-name]').attr('value', campaign.name)
+		$form.find('select[name=campaign-status]').attr('value', campaign.status)
+		$form.find('input[name=campaign-budget]').attr('value', campaign.budget)
+		$form.find('input[name=campaign-start-date]').attr('value', startDateString)
+		$form.find('input[name=campaign-end-date]').attr('value', endDateString)
 		return $form
 	}
 	
-	var updateCampaigns = function() {
+	function updateCampaigns() {
 		var $campaigns = $('.campaign-list').find('.campaign form input:checked').parent()
 		var numUpdatedCampaigns = $campaigns.length
 		var successCount = 0;
@@ -126,12 +112,12 @@ $(document).ready(function() {
 		})
 	}
 	
-	var showSuccessMessage = function(){
+	function showSuccessMessage(){
 		$('#success-message').removeClass('hidden');
 		$('.black-overlay').css('display', 'block');
 	}
 	
-	var showErrorMessage = function(){
+	function showErrorMessage(){
 		$('#error-message').removeClass('hidden');
 		$('.black-overlay').css('display', 'block');
 	}
@@ -176,6 +162,11 @@ $(document).ready(function() {
 	$('.campaign-list').on('change','#to-update', function(event){
 		var numCampaigns = $('input#to-update').length
 		var numChecked = $('input#to-update').filter(':checked').length
+		
+		console.log("click")
+		console.log(numCampaigns)
+		console.log(numChecked)
+		
 		$('#save-campaigns').attr("disabled", false)
 		
 		if (numChecked === numCampaigns){
@@ -199,19 +190,20 @@ $(document).ready(function() {
 		}
 	})
 	
-	var disableAdvertiserSelector = function() {
+	function disableAdvertiserSelector() {
 		disableElement($('#advertiser-selector'))
 		$('#advertiser-selector').html("<option value='no-choice'>Choose an advertiser...</option").trigger("change")
 	}
 	
-	var disableElement = function($el){
+	function disableElement($el){
 		$el.attr("disabled", true)
 	}
 	
-	var enableElement = function($el){
+	function enableElement($el){
 		$el.attr("disabled", false)
 	}
 	
 	populateAgencySelect();
-	$('select').chosen();
+	$('#agency-selector').chosen();
+	$('#advertiser-selector').chosen();
 })
